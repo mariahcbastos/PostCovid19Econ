@@ -83,6 +83,11 @@ scatter.smooth(x=interestCasesHU$cumulativeCases, y=interestCasesHU$InterestRate
 
 
 interestCasesHU.ts = ts(interestCasesHU$InterestRate, start = c(2019, 10), end = c(2020, 9), frequency = 5)
+
+```
+#Time Series
+
+```{r}
 #Time Series Hungary
 summary(interestCasesHU.ts)
 
@@ -91,6 +96,7 @@ interestCasesBG <- interestCases %>%
   arrange(geoId,year,month)
 
 interestCasesBG.ts = ts(interestCasesBG$InterestRate, start = c(2019, 10), end = c(2020, 9), frequency = 5)
+
 #Time Series Belgium
 summary(interestCasesBG.ts)
 
@@ -104,7 +110,6 @@ Czech Republic")
 interestCasesCZ.ts = ts(interestCasesCZ$InterestRate, start = c(2019, 10), end = c(2020, 9), frequency = 5)
 #Time Series Czech Republic
 summary(interestCasesCZ.ts)
-
 ```
 
 # Variables
@@ -120,17 +125,20 @@ summary(interestCasesCZ.ts)
 ># Null Hypothesis: There is no correlation between Covid-19 cases and key negative economic indicators in Europe
 ># Alternative Hypothesis: Covid-19 is correlated directly with key negative economic indicators in Europe.
 
-
-# Normality Test
-
-## Shapiro- Wilk Test
+## Visualisation
 
 ```{r}
 ggdensity(interestCasesHU$InterestRate, fill = "lightgray",title = "Density - Interest Rate - Hungary"  )
 ggqqplot(interestCasesHU$InterestRate, title =  "Q-Q - Interest Rate - Hungary")
 ggdensity(interestCasesBG$InterestRate, fill = "lightgray",title = "Density - Interest Rate - Belgium"  )
 ggqqplot(interestCasesBG$InterestRate, title =  "Q-Q - Interest Rate - Belgium")
+```
 
+# Normality Test
+
+## Shapiro- Wilk Test
+
+```{r}
 shapiro.test(interestCases$TotalCases)
 shapiro.test(interestCases$TotalDeaths)
 shapiro.test(interestCases$cumulativeDeaths)
@@ -156,9 +164,8 @@ sdre=sd(interestCases$InterestRate, na.rm = TRUE)
 sdre
 ```
 
-# Variance
-
 # ANOVA Test
+
 ## Hypothesis
 
 ># Null Hypothesis: H0: m1 = m2 = m3
@@ -174,6 +181,9 @@ anovaHU <- interestCases %>%
   filter(geoId == "HU") 
 anova <- interestCases 
 ```
+
+## ANOVA
+
 ```{r}
 aovResult <- aov(formula =  cumulativeCases~InterestRate , data = anova)
 summary(aovResult)
