@@ -10,15 +10,14 @@ Post COVID-19 Recovery
 # Project abstract
 On 31 December 2019, WHO was alerted to several cases of pneumonia in Wuhan City, Hubei Province of China. The virus did not match any other known virus and has changed the world as we know it. The Novel Corona Virus forced entire countries to shut down with countries like Italy, Spain and France being hit exceptionally hard. An economic catastrophe shortly followed. In this analysis, we take a look at different sectors of the European economy to find key indicators of what may be expected in the Post-Covid world.  
 
-## Problem statement 
+# Problem statement 
 Economies world-wide are experiencing extreme downturns with some of the worst coming from countries in Europe. It is imperative that with new data coming in everyday in a rapidly evolving environment, that we analyze the economy before Covid-19 as well as the economic change that has occurred during Covid-19 in order to make an accurate prediction of what can be expected in Post-Covid recovery. 
 
-## Description
+# Description
 Taking data from Eurostat, a European statistics partnership with National Statistical Institutes and other national authorities in the EU Member States, known as the European Statistical System (ESS), we preform a variety of regression analyses along with a time series analysis on different key components of the European economy in order to make an accurate prediction of what may be expected in the European Post-Covid 19 economic recovery. 
 
-## Conclusions
 
-# Load the tidyverse
+# Load the packages
 ```{r}
 install.packages("tidyverse")
 install.packages("caret")
@@ -36,8 +35,8 @@ library(lubridate)
 library(dplyr)
 ```
 
-
-# Select the columns
+# Preparing the Data
+## Load and Select the Data
 
 ```{r}
 #Loading daily cases
@@ -70,7 +69,6 @@ interestCases$TotalCases[is.na(interestCases$TotalCases)] <- 0
 interestCases$TotalDeaths[is.na(interestCases$TotalDeaths)] <- 0
 scatter.smooth(x=interestCases$TotalCases, y=interestCases$InterestRate, main="Interest Rates x Deaths")
 
-#Testing Correlation
 ```
 
 # Normality test
@@ -84,11 +82,10 @@ Testing for normality:
 
 # Hypothesis Testing
 
-# Hypothesis
+## Hypothesis
 
-># Null Hypothesis: Hashtag Retweets  for Democrats are not equal to Republicans
-
-># Alternative Hypothesis: Hashtag Retweets  for Democrats are equal to Republicans
+># Null Hypothesis: 
+># Alternative Hypothesis: 
 
 
 # Normality Test
@@ -101,14 +98,14 @@ shapiro.test(interestCases$TotalDeaths)
 shapiro.test(interestCases$cumulativeDeaths)
 shapiro.test(interestCases$cumulativeCases)
 ```
-># The data set is not normally distributed since p-value is less than alpha, therefore the distribution is significantly different from a normal distribution, we cannot assume normality. 
+># The data set is not normally distributed since p-value is less than alpha, therefore the distribution is significantly different from a normal distribution and we cannot assume normality. 
 
 ## Wilcox Test
 
 ```{r}
 wilcox.test(interestCases$cumulativeCases,interestCases$InterestRate, PAIRED = FALSE)
 ```
-# ># P value is smaller than alpha, we reject the null hypothesis. We support the alternative claim. 
+># P value is smaller than alpha, we reject the null hypothesis. We support the alternative claim. 
 
 
 # Mean and standard deviation
@@ -123,12 +120,14 @@ sdre
 
 # Variance
 
-# ANOVA tEST
+# ANOVA Test
+## Hypothesis
 
-# New Smaller Data Frame 
+># Null Hypothesis: H0: m1 = m2 = m3
 
-H0: m1 = m2 = m3
-H1: m1  ≠ m2  ≠ m3 
+># Alternative Hypothesis: H1: m1  ≠ m2  ≠ m3
+
+## Create Data Frame 
 
 ```{r}
 anovaAD <- interestCases %>% 
@@ -146,9 +145,9 @@ aovResultHU <-aov(formula =  cumulativeCases~InterestRate , data = anovaHU)
 summary(aovResultHU)
 ```
 
-># P-Value is lower than alpha, therefore we reject the null hypothesis that at all the means are equal and we conclude that at least one of the population means is different. 
+># P-Value is lower than alpha, therefore we reject the null hypothesis that at all the means are equal and we conclude that at least one of the population means is significantly different. 
 
-# TUckeyHSD Test
+# TuckeyHSD Test
 
 ```{r}
 TukeyHSD (x=aovResultHU,'interestCases$InterestRate')
@@ -161,7 +160,7 @@ Correlation <- select( interestCases, c ("cumulativeDeaths", "InterestRate"))
 pairs(Correlation)
 ```
 
-# Correlation Calculation
+## Correlation Calculation
 
 ```{r}
 calculationcor <- cor(interestCases$cumulativeCases, interestCases$InterestRate,  use = "complete.obs")
@@ -189,7 +188,7 @@ model <- lm( cumulativeCases~InterestRate , data = interestCases)
 model
 ```
 
-# Predriction
+# Prediction
 Using one country to test using the model.
 ```{r}
 test <- interestCases %>%
@@ -233,4 +232,3 @@ rsme <- RSME(Prediction$predictedPosition, test$InterestRate)
 cat("Mean Squared Error", rsme)
 ```
 
-How and why did you use regression (linear, logistic, logistic; univariate and multivariate) and time series analyses to answer your problem statement.
