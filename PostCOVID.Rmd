@@ -20,7 +20,7 @@ Economies world-wide are experiencing extreme downturns with some of the worst c
 Taking data from Eurostat, a European statistics partnership with National Statistical Institutes and other national authorities in the EU Member States, known as the European Statistical System (ESS), we preform a variety of regression analyses along with a time series analysis on different key components of the European economy in order to make an accurate prediction of what may be expected in the European Post-Covid 19 economic recovery. 
 
 
-# Load the packages
+# Load and Install the packages
 ```{r}
 install.packages("tidyverse")
 install.packages("caret")
@@ -29,11 +29,11 @@ install.packages("lubridate")
 install.packages("dplyr")
 install.packages("magrittr")
 install.packages("ggpubr")
+```
+```{r}
 library(magrittr)
 library(tidyverse)
-library(caret)
 library(caTools)
-library("ggpubr")
 library(lubridate)
 library(dplyr)
 ```
