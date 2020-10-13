@@ -147,7 +147,7 @@ shapiro.test(interestCases$cumulativeCases)
 ```{r}
 wilcox.test(interestCases$cumulativeCases,interestCases$InterestRate, PAIRED = FALSE)
 ```
-># P value is smaller than alpha, we reject the null hypothesis. 
+># P value is bigger than alpha, we fail to reject the null hypothesis. 
 
 
 # Mean and standard deviation
@@ -189,7 +189,7 @@ aovResultHU <-aov(formula =  cumulativeCases~InterestRate , data = anovaHU)
 summary(aovResultHU)
 ```
 
-># P-Value is lower than alpha, therefore we reject the null hypothesis that at all the means are equal and we conclude that at least one of the population means is significantly different. 
+># P-Value is bigger than alpha for anova result Hungary. Therefore, we fail to reject null hypothesis. And the P - value is less than alpha for anova result Belgium . Therefore, we reject null hypothesis
 
 # Correlation
 
@@ -208,7 +208,7 @@ calculationcorHU
 calculationcor <- cor(interestCases$cumulativeCases, interestCases$InterestRate,  use = "complete.obs")
 calculationcor
 ```
-># There is a weak positive correlation between Interest Rate and Cumulative Cases of COVID19, as the correlation is 0.3.
+># There is a weak positive correlation between Interest Rate and Cumulative Cases of COVID19 in Hungary and there is a moderate negative correlation between Interest Rate and Cumulative Cases of COVID19 in Belgium. 
 
 # Univariate Linear Regression
 ```{r}
