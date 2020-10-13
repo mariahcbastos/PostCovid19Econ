@@ -72,6 +72,8 @@ interestCases  <- right_join(ncdfEuropeCumulative,interest, by = c("geoId" = "Co
 #NA to 0
 interestCases$TotalCases[is.na(interestCases$TotalCases)] <- 0
 interestCases$TotalDeaths[is.na(interestCases$TotalDeaths)] <- 0
+interestCases$cumulativeDeaths[is.na(interestCases$cumulativeDeaths)] <- 0
+interestCases$cumulativeCases[is.na(interestCases$cumulativeCases)] <- 0
 
 interestCasesHU <- interestCases %>%
   filter(geoId == 'HU') 
@@ -80,6 +82,7 @@ scatter.smooth(x=interestCasesHU$cumulativeCases, y=interestCasesHU$InterestRate
 
 
 interestCasesHU.ts = ts(interestCasesHU$InterestRate, start = c(2019, 10), end = c(2020, 9), frequency = 5)
+#Time Series Hungary
 summary(interestCasesHU.ts)
 
 interestCasesBG <- interestCases %>%
@@ -87,6 +90,7 @@ interestCasesBG <- interestCases %>%
   arrange(geoId,year,month)
 
 interestCasesBG.ts = ts(interestCasesBG$InterestRate, start = c(2019, 10), end = c(2020, 9), frequency = 5)
+#Time Series Belgium
 summary(interestCasesBG.ts)
 
 interestCasesCZ <- interestCases %>%
@@ -97,6 +101,7 @@ scatter.smooth(x=interestCasesCZ$cumulativeCases, y=interestCasesCZ$InterestRate
 Czech Republic")
 
 interestCasesCZ.ts = ts(interestCasesCZ$InterestRate, start = c(2019, 10), end = c(2020, 9), frequency = 5)
+#Time Series Czech Republic
 summary(interestCasesCZ.ts)
 
 ```
@@ -120,6 +125,11 @@ summary(interestCasesCZ.ts)
 ## Shapiro- Wilk Test
 
 ```{r}
+ggdensity(interestCasesHU$InterestRate, fill = "lightgray",title = "Density - Interest Rate - Hungary"  )
+ggqqplot(interestCasesHU$InterestRate, title =  "Q-Q - Interest Rate - Hungary")
+ggdensity(interestCasesBG$InterestRate, fill = "lightgray",title = "Density - Interest Rate - Belgium"  )
+ggqqplot(interestCasesBG$InterestRate, title =  "Q-Q - Interest Rate - Belgium")
+
 shapiro.test(interestCases$TotalCases)
 shapiro.test(interestCases$TotalDeaths)
 shapiro.test(interestCases$cumulativeDeaths)
@@ -158,16 +168,14 @@ sdre
 
 ```{r}
 anovaAD <- interestCases %>% 
-  filter(geoId == "AD") 
-anovaCZ <- interestCases %>% 
-  filter(geoId == "CZ") 
+  filter(geoId == "BG") 
 anovaHU <- interestCases %>% 
   filter(geoId == "HU") 
 
 ```
 ```{r}
 aovResultCZ <- aov(formula =  cumulativeCases~InterestRate , data = anovaCZ)
-summary(aovResultCZ)
+summary(aovResultBG)
 aovResultHU <-aov(formula =  cumulativeCases~InterestRate , data = anovaHU)
 summary(aovResultHU)
 ```
@@ -183,15 +191,17 @@ TukeyHSD (x=aovResultHU,'interestCases$InterestRate')
 # Correlation
 
 ```{r}
-Correlation <- select( interestCases, c ("cumulativeDeaths", "InterestRate"))
+Correlation <- interestCasesBG %>% ungroup() %>% select( c ("cumulativeDeaths", "InterestRate"))
 pairs(Correlation)
 ```
 
 ## Correlation Calculation
 
 ```{r}
-calculationcor <- cor(interestCases$cumulativeCases, interestCases$InterestRate,  use = "complete.obs")
-calculationcor
+calculationcorBG <- cor(interestCasesBG$cumulativeCases, interestCasesBG$InterestRate,  use = "complete.obs")
+calculationcorBG
+calculationcorHU <- cor(interestCasesHU$cumulativeCases, interestCasesHU$InterestRate,  use = "complete.obs")
+calculationcorHU
 ```
 ># There is a weak positive correlation between Interest Rate and Cumulative Cases of COVID19, as the correlation is 0.3.
 
@@ -201,17 +211,17 @@ install.packages("corrplot")
 library(corrplot)
 ```
 ```{r}
-CorrelationCor <- cor(Correlation)
-CorrelationCor
+CorrelationCorBG <- cor(calculationcorBG)
+CorrelationCorBG
 ```
 
 ```{r}
-corrplot(CorrelationCor, method = "circle")
+corrplot(calculationcorBG, method = "circle")
 ```
 
 # Univariate Linear Regression
 ```{r}
-model <- lm( cumulativeCases~InterestRate , data = interestCases)
+model <- lm( cumulativeCases~InterestRate , data = interestCasesBG)
 model
 ```
 
