@@ -1,8 +1,11 @@
 ---
 title: "Post Covid-19 Recovery"
-output: html_notebook
-authors: Mariah Bastos
-         Taytumn Schlegel Ridgway
+output:
+  html_notebook: default
+  html_document:
+    df_print: paged
+  pdf_document: default
+authors: Mariah Bastos Taytumn Schlegel Ridgway
 ---
 
 Post COVID-19 Recovery 
@@ -50,24 +53,52 @@ ncdfEurope <- ncdf %>%
   group_by(month, year, geoId) %>%
     summarize(TotalCases = sum(cases), TotalDeaths = sum(deaths)) %>%
     arrange(geoId,year,month)
-#Casoos cumulativos  
+
+#Cumulative cases 
 ncdfEuropeCumulative <- ncdfEurope %>% 
   group_by(geoId) %>%
   mutate("cumulativeDeaths" = cumsum(TotalDeaths)) %>%
-  mutate("cumulativeCases" = cumsum(TotalCases))
+  mutate("cumulativeCases" = cumsum(TotalCases)) %>%
+  arrange(geoId,year,month)
 
 
-#interest rate
+#Loading interest rate
 interest <- read.delim('dataset/InterestByMonth.csv',sep =';')
+
 #creating dataframe
 idf <- data.frame(interest)
+
 #join with cases in Europe
 interestCases  <- right_join(ncdfEuropeCumulative,interest, by = c("geoId" = "Country", "month"="Month", "year" = "Year"))
+#NA to 0
 interestCases$TotalCases[is.na(interestCases$TotalCases)] <- 0
 interestCases$TotalDeaths[is.na(interestCases$TotalDeaths)] <- 0
-scatter.smooth(x=interestCases$TotalCases, y=interestCases$InterestRate, main="Interest Rates x Deaths")
-#Testing Correlation
 
+interestCasesHU <- interestCases %>%
+  filter(geoId == 'HU') 
+
+scatter.smooth(x=interestCasesHU$cumulativeCases, y=interestCasesHU$InterestRate, main="Interest Rates x Deaths - Hungary")
+
+
+interestCasesHU.ts = ts(interestCasesHU$InterestRate, start = c(2019, 10), end = c(2020, 9), frequency = 5)
+summary(interestCasesHU.ts)
+
+interestCasesBG <- interestCases %>%
+  filter(geoId == 'BG') %>%
+  arrange(geoId,year,month)
+
+interestCasesBG.ts = ts(interestCasesBG$InterestRate, start = c(2019, 10), end = c(2020, 9), frequency = 5)
+summary(interestCasesBG.ts)
+
+interestCasesCZ <- interestCases %>%
+  filter(geoId == 'CZ') %>%
+    arrange(geoId,year,month)
+
+scatter.smooth(x=interestCasesCZ$cumulativeCases, y=interestCasesCZ$InterestRate, main="Interest Rates x Deaths - 
+Czech Republic")
+
+interestCasesCZ.ts = ts(interestCasesCZ$InterestRate, start = c(2019, 10), end = c(2020, 9), frequency = 5)
+summary(interestCasesCZ.ts)
 
 ```
 
