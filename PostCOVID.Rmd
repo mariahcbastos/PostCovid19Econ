@@ -1,0 +1,239 @@
+---
+title: "Post Covid-19 Recovery"
+output: html_notebook
+authors: Mariah Bastos
+         Taytumn Schlegel Ridgway
+---
+
+Post COVID-19 Recovery 
+
+# Project abstract
+On 31 December 2019, WHO was alerted to several cases of pneumonia in Wuhan City, Hubei Province of China. The virus did not match any other known virus and has changed the world as we know it. The Novel Corona Virus forced entire countries to shut down with countries like Italy, Spain and France being hit exceptionally hard. An economic catastrophe shortly followed. In this analysis, we take a look at different sectors of the European economy to find key indicators of what may be expected in the Post-Covid world.  
+
+## Problem statement 
+Economies world-wide are experiencing extreme downturns with some of the worst coming from countries in Europe. It is imperative that with new data coming in everyday in a rapidly evolving environment, that we analyze the economy before Covid-19 as well as the economic change that has occurred during Covid-19 in order to make an accurate prediction of what can be expected in Post-Covid recovery. 
+
+## Description
+Taking data from Eurostat, a European statistics partnership with National Statistical Institutes and other national authorities in the EU Member States, known as the European Statistical System (ESS), we preform a variety of regression analyses along with a time series analysis on different key components of the European economy in order to make an accurate prediction of what may be expected in the European Post-Covid 19 economic recovery. 
+
+## Conclusions
+
+# Load the tidyverse
+```{r}
+install.packages("tidyverse")
+install.packages("caret")
+install.packages("caTools")
+install.packages("lubridate")
+install.packages("dplyr")
+install.packages("magrittr")
+install.packages("ggpubr")
+library(magrittr)
+library(tidyverse)
+library(caret)
+library(caTools)
+library("ggpubr")
+library(lubridate)
+library(dplyr)
+```
+
+
+# Select the columns
+
+```{r}
+#Loading daily cases
+numberOfCases <- read.csv('dataset/numberofcases.csv' )
+ncdf <- data.frame(numberOfCases)
+
+#Cases on Europe by month
+ncdfEurope <- ncdf %>% 
+  filter(continentExp == "Europe") %>%
+  group_by(month, year, geoId) %>%
+    summarize(TotalCases = sum(cases), TotalDeaths = sum(deaths)) %>%
+    arrange(geoId,year,month)
+#Casoos cumulativos  
+ncdfEuropeCumulative <- ncdfEurope %>% 
+  group_by(geoId) %>%
+  mutate("cumulativeDeaths" = cumsum(TotalDeaths)) %>%
+  mutate("cumulativeCases" = cumsum(TotalCases))
+
+
+#interest rate
+interest <- read.delim('dataset/InterestByMonth.csv',sep =';')
+#creating dataframe
+idf <- data.frame(interest)
+#join with cases in Europe
+interestCases  <- right_join(ncdfEuropeCumulative,interest, by = c("geoId" = "Country", "month"="Month", "year" = "Year"))
+interestCases$TotalCases[is.na(interestCases$TotalCases)] <- 0
+interestCases$TotalDeaths[is.na(interestCases$TotalDeaths)] <- 0
+scatter.smooth(x=interestCases$TotalCases, y=interestCases$InterestRate, main="Interest Rates x Deaths")
+#Testing Correlation
+
+
+```
+
+# Normality test
+Testing for normality:
+
+# Variables
+Our independent variable: 
+- Number of cases
+>#Our dependent variables: 
+
+
+>#interestRate
+
+# Hypothesis Testing
+
+# Hypothesis
+
+>#our Hypothesis: Hashtag Retweets  for Democrats are equal to Republicans
+
+>#Null Hypothesis: Hashtag Retweets  for Democrats are not equal to Republicans
+
+# Alternative Hypothesis 
+
+```{r}
+
+```
+
+# Test for Normality
+```{r}
+shapiro.test(interestCases$TotalCases)
+shapiro.test(interestCases$TotalDeaths)
+shapiro.test(interestCases$cumulativeDeaths)
+shapiro.test(interestCases$cumulativeCases)
+```
+# Not normal distribution
+
+# Wilcox Test
+
+```{r}
+wilcox.test(interestCases$cumulativeCases,interestCases$InterestRate, PAIRED = FALSE)
+```
+# P value is smaller than alpha, we reject the null hypothesis. We support the claim that there is a significant difference between the retweet counts for the Democrat Hashtags and the Republican Hashtags. 
+
+
+# Mean and standard deviation
+ 
+```{r}
+average<- interestCases %>%
+            group_by(geoId) %>%
+            summarise(average=mean(interestCases$InterestRate))
+sdre=sd(interestCases$InterestRate, na.rm = TRUE)
+sdre
+```
+
+# Variance
+
+# ANOVA tEST
+
+# New Smaller Data Frame 
+
+H0: m1 = m2 = m3
+H1: m1  ≠ m2  ≠ m3 
+
+```{r}
+anovaAD <- interestCases %>% 
+  filter(geoId == "AD") 
+anovaCZ <- interestCases %>% 
+  filter(geoId == "CZ") 
+anovaHU <- interestCases %>% 
+  filter(geoId == "HU") 
+
+```
+```{r}
+aovResultCZ <- aov(formula =  cumulativeCases~InterestRate , data = anovaCZ)
+summary(aovResultCZ)
+aovResultHU <-aov(formula =  cumulativeCases~InterestRate , data = anovaHU)
+summary(aovResultHU)
+```
+
+
+##P-Value low we reject the null hypothesis that at all the means are equal and we conclude that at least one of the population means is different
+
+# TUckeyHSD Test
+
+```{r}
+TukeyHSD (x=aovResultHU,'interestCases$InterestRate')
+```
+
+# Correlation
+
+```{r}
+Correlation <- select( interestCases, c ("cumulativeDeaths", "InterestRate"))
+pairs(Correlation)
+```
+
+# Correlation Calculation
+
+```{r}
+calculationcor <- cor(interestCases$cumulativeCases, interestCases$InterestRate,  use = "complete.obs")
+calculationcor
+```
+># There is a weak negative correlation between retweet_count and user_followers_count, as the correlation is less than 0.05
+
+# Corrplot
+```{r}
+install.packages("corrplot")
+library(corrplot)
+```
+```{r}
+CorrelationCor <- cor(Correlation)
+CorrelationCor
+```
+
+```{r}
+corrplot(CorrelationCor, method = "circle")
+```
+
+# Univariate Linear Regression
+```{r}
+model <- lm( cumulativeCases~InterestRate , data = interestCases)
+model
+```
+
+# Predriction
+Using one country to test using the model.
+```{r}
+test <- interestCases %>%
+          filter(geoId == "HU") 
+            
+predictedPosition <- predict(model, test)
+predictedPosition
+
+# Actual vs Predicted
+# Create data frame with actual and predicted values
+Prediction <- data.frame( predictedPosition,
+                                test$TotalCases)
+Prediction[is.na(Prediction)] <- 0
+test$InterestRate[is.na(test$InterestRate)] <- 0
+```
+
+# Error reporting (mae, mse, rmse)
+
+## MAE
+```{r}
+mae <- MAE(Prediction$predictedPosition, test$InterestRate)
+cat("Mean Absolute Error:", mae)
+```
+
+## MSE
+```{r}
+MSE = function(m, o){
+  (m - o)^2
+}
+mse <- MSE(Prediction$predictedPosition, test$InterestRate)
+cat("Mean Squared Error", mse)
+```
+
+## RMSE
+```{r}
+RSME = function(m, o){
+  sqrt(mean((m - o)^2))
+}
+
+rsme <- RSME(Prediction$predictedPosition, test$InterestRate)
+cat("Mean Squared Error", rsme)
+```
+
+How and why did you use regression (linear, logistic, logistic; univariate and multivariate) and time series analyses to answer your problem statement.
