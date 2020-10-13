@@ -36,6 +36,7 @@ library(tidyverse)
 library(caTools)
 library(lubridate)
 library(dplyr)
+library(ggpubr)
 ```
 
 # Preparing the Data
@@ -202,22 +203,10 @@ calculationcorBG <- cor(interestCasesBG$cumulativeCases, interestCasesBG$Interes
 calculationcorBG
 calculationcorHU <- cor(interestCasesHU$cumulativeCases, interestCasesHU$InterestRate,  use = "complete.obs")
 calculationcorHU
+calculationcor <- cor(interestCases$cumulativeCases, interestCases$InterestRate,  use = "complete.obs")
+calculationcor
 ```
 ># There is a weak positive correlation between Interest Rate and Cumulative Cases of COVID19, as the correlation is 0.3.
-
-# Corrplot
-```{r}
-install.packages("corrplot")
-library(corrplot)
-```
-```{r}
-CorrelationCorBG <- cor(calculationcorBG)
-CorrelationCorBG
-```
-
-```{r}
-corrplot(calculationcorBG, method = "circle")
-```
 
 # Univariate Linear Regression
 ```{r}
