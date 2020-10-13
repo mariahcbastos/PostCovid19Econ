@@ -168,26 +168,22 @@ sdre
 ## Create Data Frame 
 
 ```{r}
-anovaAD <- interestCases %>% 
+anovaBG <- interestCases %>% 
   filter(geoId == "BG") 
 anovaHU <- interestCases %>% 
   filter(geoId == "HU") 
-
+anova <- interestCases 
 ```
 ```{r}
-aovResultCZ <- aov(formula =  cumulativeCases~InterestRate , data = anovaCZ)
+aovResult <- aov(formula =  cumulativeCases~InterestRate , data = anova)
+summary(aovResult)
+aovResultBG <- aov(formula =  cumulativeCases~InterestRate , data = anovaBG)
 summary(aovResultBG)
 aovResultHU <-aov(formula =  cumulativeCases~InterestRate , data = anovaHU)
 summary(aovResultHU)
 ```
 
 ># P-Value is lower than alpha, therefore we reject the null hypothesis that at all the means are equal and we conclude that at least one of the population means is significantly different. 
-
-# TuckeyHSD Test
-
-```{r}
-TukeyHSD (x=aovResultHU,'interestCases$InterestRate')
-```
 
 # Correlation
 
