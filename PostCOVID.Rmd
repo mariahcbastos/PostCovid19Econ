@@ -33,9 +33,7 @@ install.packages("ggpubr")
 ```{r}
 library(magrittr)
 library(tidyverse)
-library(caret)
 library(caTools)
-library("ggpubr")
 library(lubridate)
 library(dplyr)
 ```
