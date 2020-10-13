@@ -44,73 +44,71 @@ library(dplyr)
 numberOfCases <- read.csv('dataset/numberofcases.csv' )
 ncdf <- data.frame(numberOfCases)
 
-#Cases on Europe by month
+#Cases in Europe per month
 ncdfEurope <- ncdf %>% 
   filter(continentExp == "Europe") %>%
   group_by(month, year, geoId) %>%
     summarize(TotalCases = sum(cases), TotalDeaths = sum(deaths)) %>%
     arrange(geoId,year,month)
-#Casoos cumulativos  
+
+#Cumulative Cases 
 ncdfEuropeCumulative <- ncdfEurope %>% 
   group_by(geoId) %>%
   mutate("cumulativeDeaths" = cumsum(TotalDeaths)) %>%
   mutate("cumulativeCases" = cumsum(TotalCases))
 
 
-#interest rate
+#Interest Rate
 interest <- read.delim('dataset/InterestByMonth.csv',sep =';')
-#creating dataframe
+
+#Creating dataframe
 idf <- data.frame(interest)
-#join with cases in Europe
+
+#Joining the dataframe with cases in Europe
 interestCases  <- right_join(ncdfEuropeCumulative,interest, by = c("geoId" = "Country", "month"="Month", "year" = "Year"))
 interestCases$TotalCases[is.na(interestCases$TotalCases)] <- 0
 interestCases$TotalDeaths[is.na(interestCases$TotalDeaths)] <- 0
 scatter.smooth(x=interestCases$TotalCases, y=interestCases$InterestRate, main="Interest Rates x Deaths")
+
 #Testing Correlation
-
-
 ```
 
 # Normality test
 Testing for normality:
 
 # Variables
-Our independent variable: 
-- Number of cases
->#Our dependent variables: 
-
-
->#interestRate
+># Our independent variable: 
+   - Number of cases
+   Our dependent variables: 
+   - Interest Rate
 
 # Hypothesis Testing
 
 # Hypothesis
 
->#our Hypothesis: Hashtag Retweets  for Democrats are equal to Republicans
+># Null Hypothesis: Hashtag Retweets  for Democrats are not equal to Republicans
 
->#Null Hypothesis: Hashtag Retweets  for Democrats are not equal to Republicans
+># Alternative Hypothesis: Hashtag Retweets  for Democrats are equal to Republicans
 
-# Alternative Hypothesis 
 
-```{r}
+# Normality Test
 
-```
+## Shapiro- Wilk Test
 
-# Test for Normality
 ```{r}
 shapiro.test(interestCases$TotalCases)
 shapiro.test(interestCases$TotalDeaths)
 shapiro.test(interestCases$cumulativeDeaths)
 shapiro.test(interestCases$cumulativeCases)
 ```
-# Not normal distribution
+># The data set is not normally distributed since p-value is less than alpha, therefore the distribution is significantly different from a normal distribution, we cannot assume normality. 
 
-# Wilcox Test
+## Wilcox Test
 
 ```{r}
 wilcox.test(interestCases$cumulativeCases,interestCases$InterestRate, PAIRED = FALSE)
 ```
-# P value is smaller than alpha, we reject the null hypothesis. We support the claim that there is a significant difference between the retweet counts for the Democrat Hashtags and the Republican Hashtags. 
+# ># P value is smaller than alpha, we reject the null hypothesis. We support the alternative claim. 
 
 
 # Mean and standard deviation
@@ -148,8 +146,7 @@ aovResultHU <-aov(formula =  cumulativeCases~InterestRate , data = anovaHU)
 summary(aovResultHU)
 ```
 
-
-##P-Value low we reject the null hypothesis that at all the means are equal and we conclude that at least one of the population means is different
+># P-Value is lower than alpha, therefore we reject the null hypothesis that at all the means are equal and we conclude that at least one of the population means is different. 
 
 # TUckeyHSD Test
 
@@ -170,7 +167,7 @@ pairs(Correlation)
 calculationcor <- cor(interestCases$cumulativeCases, interestCases$InterestRate,  use = "complete.obs")
 calculationcor
 ```
-># There is a weak negative correlation between retweet_count and user_followers_count, as the correlation is less than 0.05
+># There is a weak positive correlation between Interest Rate and Cumulative Cases of COVID19, as the correlation is 0.3.
 
 # Corrplot
 ```{r}
