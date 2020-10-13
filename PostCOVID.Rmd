@@ -71,9 +71,6 @@ scatter.smooth(x=interestCases$TotalCases, y=interestCases$InterestRate, main="I
 
 ```
 
-# Normality test
-Testing for normality:
-
 # Variables
 ># Our independent variable: 
    - Number of cases
@@ -84,8 +81,8 @@ Testing for normality:
 
 ## Hypothesis
 
-># Null Hypothesis: 
-># Alternative Hypothesis: 
+># Null Hypothesis: There is no correlation between Covid-19 cases and key negative economic indicators in Europe
+># Alternative Hypothesis: Covid-19 is correlated directly with key negative economic indicators in Europe.
 
 
 # Normality Test
@@ -105,7 +102,7 @@ shapiro.test(interestCases$cumulativeCases)
 ```{r}
 wilcox.test(interestCases$cumulativeCases,interestCases$InterestRate, PAIRED = FALSE)
 ```
-># P value is smaller than alpha, we reject the null hypothesis. We support the alternative claim. 
+># P value is smaller than alpha, we reject the null hypothesis. 
 
 
 # Mean and standard deviation
